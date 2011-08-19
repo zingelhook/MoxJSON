@@ -2,7 +2,7 @@ var Client = require('mysql').Client;
 var client = new Client();
 client.user = 'root';
 client.password = 'hellcat';
-var dataTemplateId;
+var dataTemplateId,output;
 var dataRows = new Array();
 var svcLog = require('./serviceLog.js');
 var randomData = require('./RandomData.js');
@@ -241,15 +241,27 @@ function getDataTemplate(client) {
                 //maybe we can write respose here
                 if (dataRows) {
                     SVCresponse.writeHead(200, {
-                        'Content-Type': 'application/x-javascript; charset=utf-8'
+                        //'Content-Type': 'application/x-javascript; charset=utf-8'
+                        'Content-Type': 'application/json'
+                        
                     });
                     //var count = dataRows.length;
                     svcLog.logService(request, 'user', svcId, numberOfDataRows);
                     // errorHandler.logError(request,'This is a test error--------',callback);
                     var str = JSON.stringify(dataRows);
-
-                    SVCresponse.write('moxsvc' + '(' + str + ')');
-
+                    if(output){
+                        if(output==='json'){
+                         SVCresponse.write(str);   
+                        }
+                        else{
+                            SVCresponse.write('moxsvc' + '(' + str + ')');
+                        }
+                    }
+                    else{
+                        SVCresponse.write('moxsvc' + '(' + str + ')');
+                    }
+                   // SVCresponse.write('moxsvc' + '(' + str + ')');
+                   // SVCresponse.write(str);
                     SVCresponse.end();
                 }
                 else {
@@ -267,8 +279,8 @@ function getDataTemplate(client) {
 
 }
 
-exports.getData = function(id, response, userrequest) {
-
+exports.getData = function(id, response, userrequest,outputType) {
+    output=outputType;
     request = userrequest;
     SVCresponse = response;
     dataTemplateId = id;
