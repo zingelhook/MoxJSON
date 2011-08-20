@@ -132,10 +132,13 @@ function getSingleData(predefinedSampleData, field) {
     var data = '';
     if (predefinedSampleData) {
         data = getPredefinedSampleData(predefinedSampleData,field);
-        if (!data) {
+    
+        if (!data && data!==0) {
             //must be custom
-            data = "Could Not Generate?";
+
+            data = predefinedSampleData + '|' + field + "-Could Not Generate?";
         }
+     
     }
     else {
         //custom
@@ -305,12 +308,14 @@ exports.getData = function(id, response, userrequest,outputType) {
 
 
 function getRandonNumber(num) {
+    var num;
 	var str = '';
 	for (i=0;i<=num;i++)
 	{
-		str = str + '' + Math.floor(Math.random() * 9) + '';
+       num = Math.floor(Math.random() * 9);
+		//str = str + '' + Math.floor(Math.random() * 9) + '';
 	}
-    return str;
+    return num;
 }
 
 
