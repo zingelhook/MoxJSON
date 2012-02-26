@@ -12,6 +12,6 @@ exports.MYSQLusername='root';
 exports.MYSQLdbname='mockJSON';
 exports.MYSQLhost='';
 exports.MYSQLpassword='hellcat';
-exports.MYSQLport='3606';
+exports.MYSQLport='3306';
 */
 

@@ -1,8 +1,8 @@
 
-var Client = require('mysql').Client;
-var client = new Client();
-client.user = 'root';
-client.password = 'hellcat';
+var config = require('./config.js');
+
+var client = new require("mysql").createClient({host:'localhost',port:config.MYSQLport,user: config.MYSQLusername,password:config.MYSQLpassword,database: config.MYSQLdbname});
+
 
 
 
