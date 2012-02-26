@@ -1,5 +1,5 @@
 var http = require('http'),
-sys = require('sys');
+var sys = require ('util')
 var url = require('url');
 var mock = require('./mockData.js');
 var svcLog = require('./serviceLog.js');
