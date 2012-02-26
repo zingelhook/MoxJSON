@@ -1,7 +1,6 @@
+var config = require('./config.js');
 
-var username='root',dbname='mockJSON',host='',password='root',port='8889';
-
-var client = new require("mysql").createClient({host:'localhost',port:port,user: username,password:password,database: dbname});
+var client = new require("mysql").createClient({host:'localhost',port:config.MYSQLport,user: config.MYSQLusername,password:config.MYSQLpassword,database: config.MYSQLdbname});
 
 var dataTemplateId,output;
 var dataRows = new Array();
@@ -90,14 +89,12 @@ function getPredefinedSampleData(name, field) {
 			else
 			{
 				data = 'No Sample Data';
-	
 			}
             break;
         default:
             return null;
 
         }
-
 
     }
 	if(field.Options){
@@ -116,8 +113,6 @@ function getPredefinedSampleData(name, field) {
 			data=data + opt.append;	
 		}
 	
-
-
 	}
     return data;
 }
@@ -132,7 +127,6 @@ function getSingleData(predefinedSampleData, field) {
     
         if (!data && data!==0) {
             //must be custom
-
             data = predefinedSampleData + '|' + field + "-Could Not Generate?";
         }
      
@@ -166,9 +160,7 @@ function ClientConnectionReady(client) {
             client.end();
             return;
         }
-
         getDataTemplate(client);
-
     });
 }
 
@@ -202,10 +194,7 @@ function getDataTemplate(client) {
             var min = templateresults[0].min;
             var max = templateresults[0].max;
 
-
-
             var values = [svcId];
-
             client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id	join Service_FieldType ft on ft.id = sf.typeId 	where dataTemplateId=?', values,
             function(error, results) {
                 if (error) {
@@ -229,25 +218,19 @@ function getDataTemplate(client) {
 
                 var myTemplate = new dataTemplate(myFields, 'KevinTest', 'en-us');
                 var numberOfDataRows = randomData.randomXToY(min, max);
-                //Math.floor(Math.random() * 500);
+
                 //generate the rows.
                 for (var ii = 0; ii < numberOfDataRows; ii++) {
 
                     dataRows.push(generateRow(myFields, 'user'));
                 }
 
-
-
                 //maybe we can write respose here
                 if (dataRows) {
-                    SVCresponse.writeHead(200, {
-                        //'Content-Type': 'application/x-javascript; charset=utf-8'
-                        'Content-Type': 'application/json'
-                        
-                    });
-                    //var count = dataRows.length;
+                    SVCresponse.writeHead(200, {'Content-Type': 'application/json'});
+        
                     svcLog.logService(request, 'user', svcId, numberOfDataRows);
-                    // errorHandler.logError(request,'This is a test error--------',callback);
+
                     var str = JSON.stringify(dataRows);
                     if(output){
                         if(output==='json'){
@@ -260,8 +243,6 @@ function getDataTemplate(client) {
                     else{
                         SVCresponse.write('moxsvc' + '(' + str + ')');
                     }
-                   // SVCresponse.write('moxsvc' + '(' + str + ')');
-                   // SVCresponse.write(str);
                     SVCresponse.end();
                 }
                 else {
@@ -285,13 +266,7 @@ exports.getData = function(id, response, userrequest,outputType) {
     SVCresponse = response;
     dataTemplateId = id;
     //check the connection. If connected move on, else make the connection.
-    if (client.connected === false) {
-        ClientConnectionReady(client);
-    }
-    else {
-        ClientConnectionReady(client);
-    }
-
+    ClientConnectionReady(client);
 };
 
 
@@ -302,12 +277,9 @@ function getRandonNumber(num) {
 	for (i=0;i<=num;i++)
 	{
        num = Math.floor(Math.random() * 9);
-		//str = str + '' + Math.floor(Math.random() * 9) + '';
 	}
     return num;
 }
-
-
 
 
 

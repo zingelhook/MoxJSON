@@ -1,6 +1,7 @@
+var config = require('./config.js');
 
-var username='root',dbname='mockJSON',host='',password='root',port='8889';
-var client = new require("mysql").createClient({host:'localhost',port:port,user: username,password:password,database: dbname});
+var client = new require("mysql").createClient({host:'localhost',port:config.MYSQLport,user: config.MYSQLusername,password:config.MYSQLpassword,database: config.MYSQLdbname});
+
 
 exports.logService = function(request, userName, serviceid, numberOfRows) {
 
