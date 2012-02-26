@@ -1,24 +1,12 @@
-//
-var Client = require('mysql').Client;
-var client = new Client();
-client.user = 'root';
-client.password = 'hellcat';
 
-
+var username='root',dbname='mockJSON',host='',password='root',port='8889';
+var client = new require("mysql").createClient({host:'localhost',port:port,user: username,password:password,database: dbname});
 
 exports.logService = function(request, userName, serviceid, numberOfRows) {
 
     //check the connection. If connected move on, else make the connection.
     if (client.connected === false) {
-
-        client.connect(function(error, results) {
-            if (error) {
-                console.log('Connection Error: ' + error.message);
-                return;
-            }
             ClientConnectionReady(client);
-
-        });
     }
     else
     {
@@ -40,8 +28,6 @@ exports.logService = function(request, userName, serviceid, numberOfRows) {
 
     function ClientReady(client)
     {
-
-
         var userAgent = request.headers['user-agent'];
         var svcId;
 
@@ -60,11 +46,8 @@ exports.logService = function(request, userName, serviceid, numberOfRows) {
                 client.end();
                 return;
             }
-            //console.log('Inserted: ' + results.affectedRows + ' row.');
-            //console.log('Id inserted: ' + results.insertId);
-        }
-        );
 
+        });
     }
 }
 

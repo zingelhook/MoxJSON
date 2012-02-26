@@ -14,9 +14,7 @@ var server = http.createServer(function(request, response) {
     var user = 'kgaddy';
     request.addListener('end',
     function() {
-
 		var serviceid = id;
-		
  		mock.getData(serviceid,response,request,output);
     });
 

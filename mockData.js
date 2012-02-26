@@ -1,7 +1,8 @@
-var Client = require('mysql').Client;
-var client = new Client();
-client.user = 'root';
-client.password = 'hellcat';
+
+var username='root',dbname='mockJSON',host='',password='root',port='8889';
+
+var client = new require("mysql").createClient({host:'localhost',port:port,user: username,password:password,database: dbname});
+
 var dataTemplateId,output;
 var dataRows = new Array();
 var svcLog = require('./serviceLog.js');
@@ -71,7 +72,6 @@ function getPredefinedSampleData(name, field) {
 					num = parseInt(opt.length,10);
 				}
 			}	
-	
             data = getRandonNumber(num);
 
             break;
@@ -125,10 +125,7 @@ function getPredefinedSampleData(name, field) {
 var serviceType = 0;
 
 
-
-
 function getSingleData(predefinedSampleData, field) {
-    //http://www.giantflyingsaucer.com/blog/?p=2596
     var data = '';
     if (predefinedSampleData) {
         data = getPredefinedSampleData(predefinedSampleData,field);
@@ -289,15 +286,7 @@ exports.getData = function(id, response, userrequest,outputType) {
     dataTemplateId = id;
     //check the connection. If connected move on, else make the connection.
     if (client.connected === false) {
-
-        client.connect(function(error, results) {
-            if (error) {
-                console.log('Connection Error: ' + error.message);
-                return;
-            }
-            ClientConnectionReady(client);
-
-        });
+        ClientConnectionReady(client);
     }
     else {
         ClientConnectionReady(client);
@@ -320,48 +309,7 @@ function getRandonNumber(num) {
 
 
 
-//returns a rondom user.
-/*
-var user = function() {
-    var randomnumber = Math.floor(Math.random() * 26);
 
-    var fistRnd = Math.floor(Math.random() * MALE_FIRST_NAME.length);
-    var lastRnd = Math.floor(Math.random() * LAST_NAME.length);
-    var rndCity = Math.floor(Math.random() * CITIES.length);
-    var rndState = Math.floor(Math.random() * STATES.length);
-    var firstName;
-    var maleOrFemale = Math.floor(Math.random() * 100);
-    if (maleOrFemale > 49) {
-        firstName = MALE_FIRST_NAME[fistRnd];
-    }
-    else {
-        firstName = FEMALE_LASTNAME[fistRnd];
-    }
-    this.FirstName = firstName;
-    this.userName = alphabet[randomnumber] + firstName;
-    this.LastName = LAST_NAME[lastRnd];
-    this.AddressOne = randomData.buildAddress();
-    this.State = STATES[rndState];
-    this.City = CITIES[rndCity];
-    this.PostalCode = randomData.buildRandomZip();
-
-};
-
-*/
-/*
- * Date Format 1.2.3
- * (c) 2007-2009 Steven Levithan <stevenlevithan.com>
- * MIT license
- *
- * Includes enhancements by Scott Trenda <scott.trenda.net>
- * and Kris Kowal <cixar.com/~kris.kowal/>
- *
- * Accepts a date, a mask, or a date and a mask.
- * Returns a formatted version of the given date.
- * The date defaults to the current date/time.
- * The mask defaults to dateFormat.masks.default.
- http://blog.stevenlevithan.com/archives/date-time-format
- */
 
 var dateFormat = function () {
     var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
