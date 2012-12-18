@@ -14,6 +14,7 @@
 
 SET NAMES utf8;
 SET FOREIGN_KEY_CHECKS = 0;
+use mockjson;
 
 -- ----------------------------
 --  Table structure for `Error_Log`
