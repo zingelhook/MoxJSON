@@ -38,8 +38,8 @@ function getPredefinedSampleData(name, field) {
         case 'LastName':
             data = randomData.getRandomLastName();
             break;
-        case 'FullName':
-            data = randomData.getFirstName() + randomData.getRandomLastName();
+        case 'Full Name':
+            data = randomData.getFirstName() + ' ' + randomData.getRandomLastName();
             break;
         case 'USPostal':
             data = randomData.buildRandomZip();
