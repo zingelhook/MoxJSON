@@ -8,7 +8,7 @@ var server = http.createServer(function(request, response) {
     var urlObj = url.parse(request.url, true);
     var id = urlObj.query.id;
     var output = urlObj.query.output;
-    var user = 'kgaddy';
+    //var user = 'kgaddy';
     request.addListener('end',
     function() {
 		var serviceid = id;

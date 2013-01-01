@@ -24,9 +24,7 @@ var dataTemplate = function(fields, name, lang) {
 };
 
 function getPredefinedSampleData(name, field) {
-
     var data = '';
-
     if (name) {
         switch (name) {
         case 'Date':
@@ -124,10 +122,9 @@ function getSingleData(predefinedSampleData, field) {
     var data = '';
     if (predefinedSampleData) {
         data = getPredefinedSampleData(predefinedSampleData,field);
-    
         if (!data && data!==0) {
             //must be custom
-            data = predefinedSampleData + '|' + field + "-Could Not Generate?";
+            data = '';
         }
      
     }
@@ -176,7 +173,6 @@ function getDataTemplate(client) {
     else {
         svcId = 0;
     }
-
 
 
     var values = [svcId];

@@ -234,8 +234,8 @@ LAST_NAME.push('Panagopoulos');
 var STREET = [];
 
 STREET.push('Rotherhithe Street');
-STREET.push(' Abbey Orchard St');
-STREET.push(' Old Compton Street');
+STREET.push('Abbey Orchard St');
+STREET.push('Old Compton Street');
 STREET.push('Three Colt St');
 STREET.push('Charing Cross Road');
 STREET.push('Liverpool Road');
