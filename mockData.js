@@ -137,13 +137,20 @@ function getSingleData(predefinedSampleData, field) {
 
 
 //go throgh 
-function generateRow(fields, name) {
+function generateRow(fields, name,id) {
 
     var numberOfFields = fields.length;
     var obj = new Object();
     for (var i = 0; i < numberOfFields; i++) {
-        var data = getSingleData(fields[i].PredefinedSampleData, fields[i]);
-        obj[fields[i].Name] = data;
+	
+		if(fields[i].Name=='id'){
+			data=id;
+			obj[fields[i].Name] = data;
+		}
+		else{
+        	var data = getSingleData(fields[i].PredefinedSampleData, fields[i]);
+        	obj[fields[i].Name] = data;
+		}
     }
 
     return obj;
@@ -205,20 +212,22 @@ function getDataTemplate(client) {
                 for (var i = 0; i < numberOfFields; i++) {
 
                     var field = new Field(results[i].name, results[i].typeName, results[i].predifinedData, results[i].options, results[i].sampleData);
-
+					//console.log(field);
                     myFields.push(field);
 
                 }
-
-               // randomData.randomXToY(min, max);
-
+				
+				//add id to every row
+				var idField = new Field('id','string','','Number','');
+				myFields.push(idField);
+		
                 var myTemplate = new dataTemplate(myFields, 'KevinTest', 'en-us');
                 var numberOfDataRows = randomData.randomXToY(min, max);
 
                 //generate the rows.
                 for (var ii = 0; ii < numberOfDataRows; ii++) {
 
-                    dataRows.push(generateRow(myFields, 'user'));
+                    dataRows.push(generateRow(myFields, 'user',ii + 1));
                 }
 
                 //maybe we can write respose here
