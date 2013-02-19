@@ -186,7 +186,7 @@ function getDataTemplate(client) {
     var myFields = new Array();
 
 
-    client.query('Select * from Service_DataTemplates where id=?', values,
+    client.query('Select * from Service_DataTemplates where idCode=?', values,
     function(error, templateresults) {
         if (error) {
             console.log("ClientReady Error: " + error.message);
@@ -196,8 +196,9 @@ function getDataTemplate(client) {
         if (templateresults.length > 0) {
             var min = templateresults[0].min;
             var max = templateresults[0].max;
-
-            var values = [svcId];
+			var id = templateresults[0].id;
+			console.log(id);
+            var values = [id];
             client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id	join Service_FieldType ft on ft.id = sf.typeId 	where dataTemplateId=?', values,
             function(error, results) {
                 if (error) {
