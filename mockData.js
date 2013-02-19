@@ -197,7 +197,7 @@ function getDataTemplate(client) {
             var min = templateresults[0].min;
             var max = templateresults[0].max;
 			var id = templateresults[0].id;
-			console.log(id);
+		
             var values = [id];
             client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id	join Service_FieldType ft on ft.id = sf.typeId 	where dataTemplateId=?', values,
             function(error, results) {
@@ -235,7 +235,7 @@ function getDataTemplate(client) {
                 if (dataRows) {
                     SVCresponse.writeHead(200, {'Content-Type': 'application/json'});
         
-                    svcLog.logService(request, 'user', svcId, numberOfDataRows);
+                    svcLog.logService(request, 'user', id, numberOfDataRows);
 
                     var str = JSON.stringify(dataRows);
                     if(output){
