@@ -23,6 +23,107 @@ var Field = function(name, type, predefinedSampleData, options, sampleData) {
     this.sampleData = sampleData;
 
 };
+
+var MockField = (function() {
+    function MockField(name, typeName, predifinedData, options, sampleData) {
+        this.Name = name;
+        this.TypeName = typeName;
+        this.PredifinedData = predifinedData;
+        this.Options = options;
+        this.SampleData = sampleData;
+    }
+
+    return MockField;
+})();
+
+exports.getData = function(id, response, userrequest, outputType) {
+    output = outputType;
+    request = userrequest;
+    SVCresponse = response;
+    dataTemplateId = id;
+    //check the connection. If connected move on, else make the connection.
+    ClientConnectionReady(client);
+};
+
+function ClientConnectionReady(client) {
+    client.query('USE mockJSON',
+
+    function(error, results) {
+        if (error) {
+            console.log('ClientConnectionReady Error: ' + error.message);
+            client.end();
+            return;
+        }
+        //getDataTemplate(client);
+        var callback = function(obj){
+            console.log(obj);
+        }
+        var dt = new DataTemplate();
+        dt.Load(dataTemplateId,callback);
+       
+    });
+};
+var DataTemplate = (function() {
+    function DataTemplate(id) {
+        this.Id = id;
+
+    }
+    DataTemplate.prototype.Load = function(id,callback) {
+        var dataTemplate = this;
+        var values = [id];
+        client.query('Select * from Service_DataTemplates where idCode=?', values, function(error, templateresults) {
+            if (error) {
+                console.log("ClientReady Error: " + error.message);
+                client.end();
+                return;
+            }
+            if (templateresults.length > 0) {
+                dataTemplate.Name = templateresults[0].name;
+                dataTemplate.Id = id;
+                dataTemplate.LanguageVar = templateresults[0].langVar;
+                dataTemplate.Min = templateresults[0].min;
+                dataTemplate.Max = templateresults[0].max;
+                dataTemplate.LoadFields(id,callback);
+
+            }
+        });
+
+    };
+    DataTemplate.prototype.LoadFields = function(id,callback) {
+        var dataTemplate = this;
+        var values = [id];
+        client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id    join Service_FieldType ft on ft.id = sf.typeId  where dataTemplateId=?', values,
+
+
+        function(error, results) {
+
+            if (error) {
+                console.log("ClientReady Error: " + error.message);
+                client.end();
+                return;
+            }
+            dataTemplate.Fields = [];
+            var numberOfFields = results.length;
+
+            //get the fields.
+            for (var i = 0; i < numberOfFields; i++) {
+
+                var field = new MockField(results[i].name, results[i].typeName, results[i].predifinedData, results[i].options, results[i].sampleData);
+                //console.log(field);
+                dataTemplate.Fields.push(field);
+
+            }
+            
+            callback(dataTemplate);
+        });
+    };
+    DataTemplate.prototype.LoadSubMocks = function() {
+        //return "Hello, " + this.greeting;
+    };
+    return DataTemplate;
+})();
+
+
 var dataTemplate = function(fields, name, lang) {
     this.LanguageVariation = lang;
     this.Fields = fields;
@@ -158,18 +259,7 @@ function generateRow(fields, name, id) {
     return obj;
 }
 
-function ClientConnectionReady(client) {
-    client.query('USE mockJSON',
 
-    function(error, results) {
-        if (error) {
-            console.log('ClientConnectionReady Error: ' + error.message);
-            client.end();
-            return;
-        }
-        getDataTemplate(client);
-    });
-}
 
 function getDataTemplate(client) {
 
@@ -267,15 +357,6 @@ function getDataTemplate(client) {
     });
 
 }
-
-exports.getData = function(id, response, userrequest, outputType) {
-    output = outputType;
-    request = userrequest;
-    SVCresponse = response;
-    dataTemplateId = id;
-    //check the connection. If connected move on, else make the connection.
-    ClientConnectionReady(client);
-};
 
 
 
