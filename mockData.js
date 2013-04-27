@@ -1,4 +1,19 @@
 var config = require('./config.js');
+var dataTemplateId, output;
+//var dataRows = new Array();
+var svcLog = require('./serviceLog.js');
+var randomData = require('./RandomData.js');
+var request;
+var SVCresponse;
+
+exports.getData = function(id, response, userrequest, outputType) {
+    output = outputType;
+    request = userrequest;
+    SVCresponse = response;
+    dataTemplateId = id;
+    //check the connection. If connected move on, else make the connection.
+    ClientConnectionReady(client);
+};
 
 var client = new require("mysql").createClient({
     host: 'localhost',
@@ -8,13 +23,7 @@ var client = new require("mysql").createClient({
     database: config.MYSQLdbname
 });
 
-var dataTemplateId, output;
-var dataRows = new Array();
-var svcLog = require('./serviceLog.js');
-var randomData = require('./RandomData.js');
-var request;
-var SVCresponse;
-
+/*
 var Field = function(name, type, predefinedSampleData, options, sampleData) {
     this.Name = name;
     this.Type = type;
@@ -23,6 +32,27 @@ var Field = function(name, type, predefinedSampleData, options, sampleData) {
     this.sampleData = sampleData;
 
 };
+*/
+
+function ClientConnectionReady(client) {
+    client.query('USE mockJSON',
+
+    function(error, results) {
+        if (error) {
+            console.log('ClientConnectionReady Error: ' + error.message);
+            client.end();
+            return;
+        }
+        //getDataTemplate(client);
+        var callback = function(obj) {
+            console.log(obj);
+        }
+        var dt = new DataTemplate();
+        dt.Load(dataTemplateId, callback);
+
+    });
+};
+
 
 var MockField = (function() {
     function MockField(name, typeName, predifinedData, options, sampleData) {
@@ -36,39 +66,29 @@ var MockField = (function() {
     return MockField;
 })();
 
-exports.getData = function(id, response, userrequest, outputType) {
-    output = outputType;
-    request = userrequest;
-    SVCresponse = response;
-    dataTemplateId = id;
-    //check the connection. If connected move on, else make the connection.
-    ClientConnectionReady(client);
-};
 
-function ClientConnectionReady(client) {
-    client.query('USE mockJSON',
+var SubMock = (function() {
+    function SubMock(id, dataTemplateId, childTemplateId, objectName) {
+        this.Id = id;
+        this.DataTemplateId = dataTemplateId;
+        this.ChildTemplateId = childTemplateId;
+        this.ObjectName = objectName;
+        this.LoadMock(id);
+    }
+    SubMock.prototype.LoadMock = function(id) {
+        console.log(id);
 
-    function(error, results) {
-        if (error) {
-            console.log('ClientConnectionReady Error: ' + error.message);
-            client.end();
-            return;
-        }
-        //getDataTemplate(client);
-        var callback = function(obj){
-            console.log(obj);
-        }
-        var dt = new DataTemplate();
-        dt.Load(dataTemplateId,callback);
-       
-    });
-};
+    }
+
+    return SubMock;
+})();
+
+
 var DataTemplate = (function() {
     function DataTemplate(id) {
         this.Id = id;
-
     }
-    DataTemplate.prototype.Load = function(id,callback) {
+    DataTemplate.prototype.Load = function(id, callback) {
         var dataTemplate = this;
         var values = [id];
         client.query('Select * from Service_DataTemplates where idCode=?', values, function(error, templateresults) {
@@ -83,14 +103,14 @@ var DataTemplate = (function() {
                 dataTemplate.LanguageVar = templateresults[0].langVar;
                 dataTemplate.Min = templateresults[0].min;
                 dataTemplate.Max = templateresults[0].max;
-                dataTemplate.LoadFields(id,callback);
-
+                dataTemplate.LoadFields(id, callback);
+                dataTemplate.LoadSubMocks(id, null);
             }
         });
 
     };
-    DataTemplate.prototype.LoadFields = function(id,callback) {
-        var dataTemplate = this;
+    DataTemplate.prototype.LoadFields = function(id, callback) {
+        var dataTemplate = this; //do something about this name
         var values = [id];
         client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id    join Service_FieldType ft on ft.id = sf.typeId  where dataTemplateId=?', values,
 
@@ -113,22 +133,45 @@ var DataTemplate = (function() {
                 dataTemplate.Fields.push(field);
 
             }
-            
+
             callback(dataTemplate);
         });
     };
-    DataTemplate.prototype.LoadSubMocks = function() {
-        //return "Hello, " + this.greeting;
+    DataTemplate.prototype.LoadSubMocks = function(id, callback) {
+        var values = [id];
+        var dataTemplate = this;
+        client.query('Select id,dataTemplateId ,childTemplateId,objectName from Service_DataTemplates_SubTemplates where dataTemplateId=?', values,
+
+
+        function(error, results) {
+            if (error) {
+                console.log("ClientReady Error: " + error.message);
+                client.end();
+                return;
+            }
+            dataTemplate.SubMocks = [];
+
+            var count = results.length;
+            for (var i = 0; i < count; i++) {
+                var sm = new SubMock(results[i].id, results[i].dataTemplateId, results[i].childTemplateId, results[i].objectName);
+                dataTemplate.SubMocks.push(sm);
+            }
+            if (callback) {
+                // callback(dataTemplate);
+            }
+            console.log(dataTemplate);
+        });
     };
     return DataTemplate;
 })();
 
-
+/*
 var dataTemplate = function(fields, name, lang) {
     this.LanguageVariation = lang;
     this.Fields = fields;
     this.Name = name;
 };
+*/
 
 function getPredefinedSampleData(name, field) {
     var data = '';
@@ -260,7 +303,7 @@ function generateRow(fields, name, id) {
 }
 
 
-
+/*
 function getDataTemplate(client) {
 
 
@@ -357,6 +400,7 @@ function getDataTemplate(client) {
     });
 
 }
+*/
 
 
 
