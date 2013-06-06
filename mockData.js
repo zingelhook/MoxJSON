@@ -3,6 +3,7 @@ var dataTemplateId, output;
 //var dataRows = new Array();
 var svcLog = require('./serviceLog.js');
 var randomData = require('./RandomData.js');
+var objectGenerator = require('./ObjectGenerator.js');
 var request;
 var SVCresponse;
 
@@ -23,17 +24,6 @@ var client = new require("mysql").createClient({
     database: config.MYSQLdbname
 });
 
-/*
-var Field = function(name, type, predefinedSampleData, options, sampleData) {
-    this.Name = name;
-    this.Type = type;
-    this.Options = options;
-    this.PredefinedSampleData = predefinedSampleData;
-    this.sampleData = sampleData;
-
-};
-*/
-
 function ClientConnectionReady(client) {
     client.query('USE mockJSON',
 
@@ -45,14 +35,13 @@ function ClientConnectionReady(client) {
         }
         //getDataTemplate(client);
         var callback = function(obj) {
-            console.log(obj);
+            // console.log(obj);
         }
         var dt = new DataTemplate();
         dt.Load(dataTemplateId, callback);
 
     });
 };
-
 
 var MockField = (function() {
     function MockField(name, typeName, predifinedData, options, sampleData) {
@@ -61,8 +50,102 @@ var MockField = (function() {
         this.PredifinedData = predifinedData;
         this.Options = options;
         this.SampleData = sampleData;
+        this._generateData();
     }
+    MockField.prototype._generateData = function() {
+        var field = this;
+        var name = field.PredifinedData;
+        console.log(name);
+        var data = '';
+        if (name) {
+            switch (name) {
+                case 'Date':
+                    data = randomData.getSampleDate(field.Options);
+                    break;
+                case 'FirstName':
+                    data = randomData.getFirstName();
+                    break;
+                case 'LastName':
+                    data = randomData.getRandomLastName();
+                    break;
+                case 'Full Name':
+                    data = randomData.getFirstName() + ' ' + randomData.getRandomLastName();
+                    break;
+                case 'USPostal':
+                    data = randomData.buildRandomZip();
+                    break;
+                case 'City':
+                    data = randomData.getRandomCity();
+                    break;
+                case 'State':
+                    data = randomData.getRandomState();
+                    break;
+                case 'Country':
+                    data = randomData.getRandonCountry();
+                    break;
+                case 'AddressOne':
+                    data = randomData.buildAddress();
+                    break;
+                case 'Letter':
+                    var randomnumber = Math.floor(Math.random() * 26);
+                    data = alphabet[randomnumber];
+                    break;
+                case 'Lorum':
+                    data = randomData.getRandonLorum();
+                    break;
+                case 'Number':
+                    var num = 1;
+                    if (field.Options) {
+                        var opt = JSON.parse(field.Options);
+                        if (opt.length) {
+                            num = parseInt(opt.length, 10);
+                        }
+                    }
+                    data = randomData.getRandonNumber(num);
 
+                    break;
+                case 'UserName':
+                    data = randomData.randomAlphabetLower() + randomData.getRandomLastName();
+                    break;
+                case 'PlayingCard':
+                    data = randomData.dealRandomCard();
+                    break;
+                case 'Custom':
+                    if (field.sampleData) {
+                        var mySplitResult = field.sampleData.split(",");
+                        var index = Math.floor(Math.random() * mySplitResult.length);
+                        data = mySplitResult[index];
+                    } else {
+                        data = 'No Sample Data';
+                    }
+                    break;
+                default:
+                    return null;
+
+            }
+
+        }
+        if (field.Options) {
+            var opt = JSON.parse(field.Options);
+            if (opt.length) {
+                var len = parseInt(opt.length, 10);
+                if (data.length > len) {
+                    data = data.substring(0, len);
+                }
+            }
+            if (opt.prepend) {
+                data = opt.prepend + data;
+            }
+            if (opt.append) {
+                data = data + opt.append;
+            }
+
+        }
+        //console.log(data)
+        //return data;
+         this.Value=data;
+
+    }
     return MockField;
 })();
 
@@ -76,11 +159,34 @@ var SubMock = (function() {
         this.LoadMock(id);
     }
     SubMock.prototype.LoadMock = function(id) {
-        console.log(id);
-
+        //console.log(id);
+        var dt = new DataTemplate(id);
+        dt.Load(id, function() {
+            // console.log('-------')
+        })
+        this.DT = dt;
     }
 
     return SubMock;
+})();
+
+var stubMock = (function() {
+    function stubMock(mock) {
+        var count = mock.Fields.length;
+        for (var i = 0; i < count; i++) {
+            this[mock.Fields[i].Name] = mock.Fields[i].Value;
+        }
+
+        count = mock.SubMocks.length;
+        for (var i = 0; i < count; i++) {
+            //loop and build object
+            var dt = new DataTemplate(mock.SubMocks[i]);
+            dt.Load();
+
+            this[mock.SubMocks[i].ObjectName] = dt;
+        }
+    }
+    return stubMock;
 })();
 
 
@@ -88,6 +194,45 @@ var DataTemplate = (function() {
     function DataTemplate(id) {
         this.Id = id;
     }
+    DataTemplate.prototype.GenerateJSONStubObject = function(id, callback) {
+        var dataTemplate = this;
+        //generate a json representation of the mock including submocks
+        //generate each submock and load into an array
+        var mainMock = new stubMock(dataTemplate);
+
+        SVCresponse.writeHead(200, {
+            'Content-Type': 'application/json'
+        });
+        //svcLog.logService(request, 'user', id, numberOfDataRows);
+
+        var str = JSON.stringify(mainMock);
+        if (output) {
+            if (output === 'json') {
+                SVCresponse.write(str);
+            } else {
+                SVCresponse.write('moxsvc' + '(' + str + ')');
+            }
+        } else {
+            SVCresponse.write('moxsvc' + '(' + str + ')');
+        }
+        SVCresponse.end();
+    },
+    DataTemplate.prototype.GenerateObject = function(id, callback) {
+        var objGen = new objectGenerator.ObjectGenerator(this);
+        var MockedObj = objGen.GenerateMock();
+
+
+        var count = this.SubMocks.length;
+        for (var i = 0; i < count; i++) {
+            var m = new DataTemplate(this.SubMocks[i].ChildTemplateId);
+            var callback = function(m) {
+                //console.log(m);
+            }
+            m.Load(this.SubMocks[i].ChildTemplateId, callback);
+            //obj[this.Mock.Fields[i].Name] = data;
+
+        }
+    },
     DataTemplate.prototype.Load = function(id, callback) {
         var dataTemplate = this;
         var values = [id];
@@ -107,13 +252,11 @@ var DataTemplate = (function() {
                 dataTemplate.LoadSubMocks(id, null);
             }
         });
-
     };
     DataTemplate.prototype.LoadFields = function(id, callback) {
         var dataTemplate = this; //do something about this name
         var values = [id];
         client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id    join Service_FieldType ft on ft.id = sf.typeId  where dataTemplateId=?', values,
-
 
         function(error, results) {
 
@@ -155,11 +298,15 @@ var DataTemplate = (function() {
             for (var i = 0; i < count; i++) {
                 var sm = new SubMock(results[i].id, results[i].dataTemplateId, results[i].childTemplateId, results[i].objectName);
                 dataTemplate.SubMocks.push(sm);
+
             }
             if (callback) {
                 // callback(dataTemplate);
             }
-            console.log(dataTemplate);
+            //generate
+            dataTemplate.GenerateObject(this);
+            dataTemplate.GenerateJSONStubObject(this);
+
         });
     };
     return DataTemplate;
@@ -173,6 +320,17 @@ var dataTemplate = function(fields, name, lang) {
 };
 */
 
+/*
+var Field = function(name, type, predefinedSampleData, options, sampleData) {
+    this.Name = name;
+    this.Type = type;
+    this.Options = options;
+    this.PredefinedSampleData = predefinedSampleData;
+    this.sampleData = sampleData;
+
+};
+*/
+/*
 function getPredefinedSampleData(name, field) {
     var data = '';
     if (name) {
@@ -400,7 +558,7 @@ function getDataTemplate(client) {
     });
 
 }
-*/
+
 
 
 
@@ -524,3 +682,5 @@ dateFormat.i18n = {
 Date.prototype.format = function(mask, utc) {
     return dateFormat(this, mask, utc);
 };
+
+*/
