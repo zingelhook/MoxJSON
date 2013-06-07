@@ -32,6 +32,8 @@ var MockList = (function() {
             //svcLog.logService(request, 'user', id, numberOfDataRows);
 
             var str = JSON.stringify(objJSON);
+            //now clear out object
+            objJSON=[];
             if (output) {
                 if (output === 'json') {
                     SVCresponse.write(str);
