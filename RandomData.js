@@ -113,6 +113,10 @@ exports.getRandonNumber = function(num) {
     return num;
 }
 
+exports.getRandomRange = function(min, max) {
+    return parseInt(Math.random() * (max - min) + min, 10);
+}
+
 
 
 exports.dealRandomCard = function() {

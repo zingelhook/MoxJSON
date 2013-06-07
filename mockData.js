@@ -2,6 +2,7 @@ var config = require('./config.js');
 var mysql = require('./msqlClient.js');
 var log = require('./logger.js');
 var mockField = require('./mockField.js');
+var randomData = require('./RandomData.js');
 var SVCresponse;
 var mainMock;
 //contains list of all mocks that must be loaded before we can generate JSON
@@ -174,10 +175,11 @@ var Mock = (function() {
                 dataTemplate.Max = templateresults[0].max;
                 dataTemplate.Id = templateresults[0].id;
                 dataTemplate.IdCode = templateresults[0].idCode;
+                dataTemplate.RowCount = randomData.getRandomRange(dataTemplate.Min,dataTemplate.Max);
+                log.logger('row count:' + dataTemplate.RowCount);
                 values = [dataTemplate.Id];
                 //add the realid to the list.
                 if (dataTemplate.IsMain === true) {
-                    log.logger('yoyoma');
                     mocklist.Add(dataTemplate.Id);
                 }
 
