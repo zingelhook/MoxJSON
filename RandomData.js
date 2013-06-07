@@ -6,6 +6,7 @@ exports.buildRandomZip = function() {
 
 //return random first name.
 exports.getFirstName = function() {
+
     var maleOrFemale = Math.floor(Math.random() * 100);
 
     var firstName = '';
@@ -13,9 +14,10 @@ exports.getFirstName = function() {
         var fistRnd = Math.floor(Math.random() * MALE_FIRST_NAME.length);
         firstName = MALE_FIRST_NAME[fistRnd];
     } else {
-        var fistRnd = Math.floor(Math.random() * FEMALE_LASTNAME.length);
-        firstName = FEMALE_LASTNAME[fistRnd];
+        var fistRnd = Math.floor(Math.random() * FEMALE_FIRSTNAME.length);
+        firstName = FEMALE_FIRSTNAME[fistRnd];
     }
+
     return firstName;
 }
 
@@ -181,29 +183,29 @@ MALE_FIRST_NAME.push('Louis');
 MALE_FIRST_NAME.push('Agilbert');
 
 
-var FEMALE_LASTNAME = [];
-FEMALE_LASTNAME.push('Andrea');
-FEMALE_LASTNAME.push('Miranda');
-FEMALE_LASTNAME.push('Kay');
-FEMALE_LASTNAME.push('Aundrea');
-FEMALE_LASTNAME.push('Shelia');
-FEMALE_LASTNAME.push('Hallie');
-FEMALE_LASTNAME.push('Jacie');
-FEMALE_LASTNAME.push('Mary');
-FEMALE_LASTNAME.push('Dorothy');
-FEMALE_LASTNAME.push('Jennifer');
-FEMALE_LASTNAME.push('Ashley');
-FEMALE_LASTNAME.push('Kay');
-FEMALE_LASTNAME.push('Melissa');
-FEMALE_LASTNAME.push('Christie');
-FEMALE_LASTNAME.push('Amy');
-FEMALE_LASTNAME.push('Michelle');
-FEMALE_LASTNAME.push('Diane');
-FEMALE_LASTNAME.push('Anna');
-FEMALE_LASTNAME.push('Antoinette');
-FEMALE_LASTNAME.push('Morwenna');
-FEMALE_LASTNAME.push('Jessabella');
-FEMALE_LASTNAME.push('Alessandra');
+var FEMALE_FIRSTNAME = [];
+FEMALE_FIRSTNAME.push('Andrea');
+FEMALE_FIRSTNAME.push('Miranda');
+FEMALE_FIRSTNAME.push('Kay');
+FEMALE_FIRSTNAME.push('Aundrea');
+FEMALE_FIRSTNAME.push('Shelia');
+FEMALE_FIRSTNAME.push('Hallie');
+FEMALE_FIRSTNAME.push('Jacie');
+FEMALE_FIRSTNAME.push('Mary');
+FEMALE_FIRSTNAME.push('Dorothy');
+FEMALE_FIRSTNAME.push('Jennifer');
+FEMALE_FIRSTNAME.push('Ashley');
+FEMALE_FIRSTNAME.push('Kay');
+FEMALE_FIRSTNAME.push('Melissa');
+FEMALE_FIRSTNAME.push('Christie');
+FEMALE_FIRSTNAME.push('Amy');
+FEMALE_FIRSTNAME.push('Michelle');
+FEMALE_FIRSTNAME.push('Diane');
+FEMALE_FIRSTNAME.push('Anna');
+FEMALE_FIRSTNAME.push('Antoinette');
+FEMALE_FIRSTNAME.push('Morwenna');
+FEMALE_FIRSTNAME.push('Jessabella');
+FEMALE_FIRSTNAME.push('Alessandra');
 
 
 
