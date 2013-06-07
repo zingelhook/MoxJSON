@@ -1,5 +1,3 @@
-
-
 var randomData = require('./RandomData.js');
 exports.MockField = (function() {
     function MockField(name, typeName, predifinedData, options, sampleData) {
@@ -8,9 +6,10 @@ exports.MockField = (function() {
         this.PredifinedData = predifinedData;
         this.Options = options;
         this.SampleData = sampleData;
-        this._generateData();
+
     }
-    MockField.prototype._generateData = function() {
+
+    MockField.prototype.GenerateData = function() {
         var field = this;
         var name = field.PredifinedData;
         var data = '';
@@ -68,8 +67,8 @@ exports.MockField = (function() {
                     data = randomData.dealRandomCard();
                     break;
                 case 'Custom':
-                    if (field.sampleData) {
-                        var mySplitResult = field.sampleData.split(",");
+                    if (field.SampleData) {
+                        var mySplitResult = field.SampleData.split(",");
                         var index = Math.floor(Math.random() * mySplitResult.length);
                         data = mySplitResult[index];
                     } else {
@@ -96,7 +95,8 @@ exports.MockField = (function() {
             }
 
         }
-        this.Value = data;
+        //this.Value = data;
+        return data;
     }
     return MockField;
 })();
