@@ -14,12 +14,13 @@ var MockList = (function() {
     }
     MockList.prototype.Add = function(id) {
         this.List.push(id);
-        log.logger('Adding:' + id);
+        log.logger('Adding:' + id,1);
         this.MocksLoaded++;
     };
     MockList.prototype._done = function() {
-        log.logger('total mocks loaded:' + this.MocksLoaded);
+        log.logger('total mocks loaded:' + this.MocksLoaded,2);
         var callback = function() {
+
             SVCresponse.writeHead(200, {
                 'Content-Type': 'application/json'
             });
@@ -47,23 +48,23 @@ var MockList = (function() {
                 if (this.List[0] === id) {
                     this._done();
                 } else {
-                    log.logger('Trying to remove wrong item from list:' + id + ' is not what we have left:' + this.List[0]);
+                    log.logger('Trying to remove wrong item from list:' + id + ' is not what we have left:' + this.List[0],1);
                 }
 
             } else {
                 var index = this.List.indexOf(id);
                 this.List.splice(index, 1);
-                log.logger('Removing:' + id);
-                log.logger('List is at:' + this.List.length);
+                log.logger('Removing:' + id,1);
+                log.logger('List is at:' + this.List.length,1);
                 if (this.List.length === 0) {
                     this._done();
                 } else {
-                    log.logger(this.List);
+                    log.logger(this.List,1);
                 }
             }
 
         } else {
-            log.logger('Trying to remove from an empty list item:' + id);
+            log.logger('Trying to remove from an empty list item:' + id,1);
         }
     };
     return MockList;
@@ -85,13 +86,13 @@ Array.prototype.indexOf = function(obj, fromIndex) {
 };
 
 exports.getData = function(idCode, response, userrequest, outputType) {
-    log.logger('start');
+    log.logger('start',1);
     output = outputType;
     request = userrequest;
     SVCresponse = response;
     //the callback when the database client is ready.
     var callback = function() {
-        log.logger('Msql Connection Callback');
+        log.logger('Msql Connection Callback',1);
         mainMock = new Mock(null, idCode, true);
         mainMock.Load();
     };
@@ -107,15 +108,15 @@ var Mock = (function() {
         this.IdCode = idCode;
         this.IsMain = isMain;
         this.Id = id;
-        log.logger('----------------------------');
+        log.logger('----------------------------',1);
         if (dataTemplate.Id != null) {
-            log.logger('init mock with id:' + dataTemplate.Id);
+            log.logger('init mock with id:' + dataTemplate.Id,1);
         } else {
             if (!dataTemplate.IdCode) {
-                log.logger(dataTemplate);
+                log.logger(dataTemplate,1);
 
             } else {
-                log.logger('init mock with idCode:' + dataTemplate.IdCode);
+                log.logger('init mock with idCode:' + dataTemplate.IdCode,1);
             }
         }
     }
@@ -123,12 +124,11 @@ var Mock = (function() {
         var dataTemplate = this;
         dataTemplate.SingleObject = false;
         dataTemplate.MockObj = {};
-        // log.logger('############################');
-        log.logger('call MakeObj for:' + dataTemplate.Id);
+        log.logger('call MakeObj for:' + dataTemplate.Id,1);
         var rowcount = dataTemplate.RowCount;
         var fcount = dataTemplate.Fields.length;
         var scount = dataTemplate.SubMocks.length;
-        log.logger('Generating ' + rowcount + ' rows');
+        log.logger('Generating ' + rowcount + ' rows',1);
         if (dataTemplate.Max === 1 && dataTemplate.Min === 1) {
             dataTemplate.SingleObject = true;
         } else {
@@ -138,10 +138,10 @@ var Mock = (function() {
         for (var ii = 0; ii < rowcount; ii++) {
             var mockObj = {};
             var subMockObj = {};
-            log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^');
+            log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^',1);
             for (var iq = 0; iq < fcount; iq++) {
                 var data = dataTemplate.Fields[iq].GenerateData();
-                log.logger(data);
+                log.logger(data,1);
                 mockObj[dataTemplate.Fields[iq].Name] = data;
             }
 
@@ -161,7 +161,7 @@ var Mock = (function() {
                     dataTemplate.MockObj.push(mockObj);
                 }
 
-                log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^');
+                log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^',1);
             }
         }
 
@@ -174,26 +174,26 @@ var Mock = (function() {
         var values, sql, usingId;
         if (dataTemplate.Id != null) {
             usingId = dataTemplate.Id;
-            log.logger('load mock with id:' + dataTemplate.Id);
+            log.logger('load mock with id:' + dataTemplate.Id,1);
             values = [this.Id];
             sql = 'Select * from Service_DataTemplates where id=?';
         } else {
             usingId = dataTemplate.IdCode;
-            log.logger(dataTemplate);
-            log.logger('load mock with idCode:' + dataTemplate.IdCode);
+            log.logger(dataTemplate,1);
+            log.logger('load mock with idCode:' + dataTemplate.IdCode,1);
             values = [this.IdCode];
             sql = 'Select * from Service_DataTemplates where idCode=?';
         }
 
         mysql.client.query(sql, values, function(error, templateresults) {
             if (error) {
-                log.logger("ClientReady Error: " + error.message);
+                log.logger("ClientReady Error: " + error.message,1);
                 client.end();
                 return;
             }
 
             if (templateresults.length > 0) {
-                log.logger('Loading template from db:' + usingId);
+                log.logger('Loading template from db:' + usingId,1);
                 dataTemplate.Name = templateresults[0].name;
                 dataTemplate.LanguageVar = templateresults[0].langVar;
                 dataTemplate.Min = templateresults[0].min;
@@ -207,7 +207,7 @@ var Mock = (function() {
                     dataTemplate.RowCount = randomData.getRandomRange(dataTemplate.Min, dataTemplate.Max);
                 }
 
-                log.logger('row count:' + dataTemplate.RowCount);
+                log.logger('row count:' + dataTemplate.RowCount,1);
                 values = [dataTemplate.Id];
                 //add the realid to the list.
                 if (dataTemplate.IsMain === true) {
@@ -215,14 +215,14 @@ var Mock = (function() {
                 }
 
                 //now load the fields
-                log.logger('call LoadFields');
+                log.logger('call LoadFields',1);
 
                 mysql.client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id    join Service_FieldType ft on ft.id = sf.typeId  where dataTemplateId=?', values,
 
                 function(error, results) {
 
                     if (error) {
-                        log.logger("ClientReady Error: " + error.message);
+                        log.logger("ClientReady Error: " + error.message,1);
                         client.end();
                         return;
                     }
@@ -239,7 +239,7 @@ var Mock = (function() {
                         mockObj[results[i].name] = field.Value;
                     }
 
-                    log.logger('found ' + numberOfFields + ' fields for ' + dataTemplate.Id);
+                    log.logger('found ' + numberOfFields + ' fields for ' + dataTemplate.Id,1);
 
                     // now load submocks
                     log.logger('call LoadSubMocks for:' + dataTemplate.Id);
@@ -248,7 +248,7 @@ var Mock = (function() {
 
                     function(error, results) {
                         if (error) {
-                            log.logger("ClientReady Error: " + error.message);
+                            log.logger("ClientReady Error: " + error.message,1);
                             client.end();
                             return;
                         }
@@ -258,7 +258,7 @@ var Mock = (function() {
                         if (count === 0) { //if no more mock - return the response
                             mocklist.Remove(dataTemplate.Id);
                         } else { //keep loading mocks
-                            log.logger('found submocks for ' + dataTemplate.Id);
+                            log.logger('found submocks for ' + dataTemplate.Id,1);
                             for (var i = 0; i < count; i++) {
                                 mocklist.Add(results[i].childTemplateId);
                                 var sm = new SubMock(results[i].id, results[i].dataTemplateId, results[i].childTemplateId, results[i].objectName);
