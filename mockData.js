@@ -36,7 +36,7 @@ var MockList = (function() {
                 SVCresponse.write('moxsvc' + '(' + str + ')');
             }
             SVCresponse.end();
-        }
+        };
         mainMock.MakeObj(callback);
     };
     MockList.prototype.Remove = function(id) {
@@ -92,7 +92,7 @@ exports.getData = function(idCode, response, userrequest, outputType) {
         log.logger('Msql Connection Callback');
         mainMock = new Mock(null, idCode, true);
         mainMock.Load();
-    }
+    };
 
     //check the connection. If connected move on, else make the connection.
     mysql.ClientConnectionReady(mysql.client, callback);
@@ -115,9 +115,7 @@ var Mock = (function() {
             } else {
                 log.logger('init mock with idCode:' + dataTemplate.IdCode);
             }
-
         }
-
     }
     Mock.prototype.MakeObj = function(callback) {
         var dataTemplate = this;
@@ -133,10 +131,10 @@ var Mock = (function() {
 
         count = dataTemplate.SubMocks.length;
         for (var i = 0; i < count; i++) {
-            //log.logger(dataTemplate.SubMocks[i].Mock);
+         
             dataTemplate.SubMocks[i].Mock.MakeObj();
             var obj = dataTemplate.SubMocks[i].Mock;
-            //console.log(obj);
+
             dataTemplate.MockObj[dataTemplate.SubMocks[i].ObjectName] = dataTemplate.SubMocks[i].Mock.MockObj;
         }
         log.logger('############################');
@@ -151,7 +149,7 @@ var Mock = (function() {
             usingId = dataTemplate.Id;
             log.logger('load mock with id:' + dataTemplate.Id);
             values = [this.Id];
-            sql = 'Select * from Service_DataTemplates where id=?'
+            sql = 'Select * from Service_DataTemplates where id=?';
         } else {
 
             usingId = dataTemplate.IdCode;
@@ -260,7 +258,7 @@ var SubMock = (function() {
         var dt = new Mock(id, null, false);
         dt.Load('byId');
         this.Mock = dt;
-    }
+    };
 
     return SubMock;
 })();
