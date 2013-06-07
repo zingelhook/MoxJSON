@@ -5,6 +5,7 @@ var mockField = require('./mockField.js');
 var randomData = require('./RandomData.js');
 var SVCresponse;
 var mainMock;
+var objJSON = [];
 //contains list of all mocks that must be loaded before we can generate JSON
 var MockList = (function() {
     function MockList() {
@@ -26,7 +27,7 @@ var MockList = (function() {
             //log this here 
             //svcLog.logService(request, 'user', id, numberOfDataRows);
 
-            var str = JSON.stringify(mainMock.MockObj);
+            var str = JSON.stringify(objJSON);
             if (output) {
                 if (output === 'json') {
                     SVCresponse.write(str);
@@ -56,7 +57,7 @@ var MockList = (function() {
                 log.logger('List is at:' + this.List.length);
                 if (this.List.length === 0) {
                     this._done();
-                }else{
+                } else {
                     log.logger(this.List);
                 }
             }
@@ -120,25 +121,50 @@ var Mock = (function() {
     }
     Mock.prototype.MakeObj = function(callback) {
         var dataTemplate = this;
+        dataTemplate.SingleObject = false;
         dataTemplate.MockObj = {};
-        log.logger('############################');
+        // log.logger('############################');
         log.logger('call MakeObj for:' + dataTemplate.Id);
-
-        var count = dataTemplate.Fields.length;
-        for (var i = 0; i < count; i++) {
-            //log.logger(dataTemplate.Fields[i].Name);
-            this.MockObj[dataTemplate.Fields[i].Name] = dataTemplate.Fields[i].Value;
+        var rowcount = dataTemplate.RowCount;
+        var fcount = dataTemplate.Fields.length;
+        var scount = dataTemplate.SubMocks.length;
+        log.logger('Generating ' + rowcount + ' rows');
+        if (dataTemplate.Max === 1 && dataTemplate.Min === 1) {
+            dataTemplate.SingleObject = true;
+        } else {
+            dataTemplate.MockObj = [];
         }
 
-        count = dataTemplate.SubMocks.length;
-        for (var i = 0; i < count; i++) {
-         
-            dataTemplate.SubMocks[i].Mock.MakeObj();
-            var obj = dataTemplate.SubMocks[i].Mock;
+        for (var ii = 0; ii < rowcount; ii++) {
+            var mockObj = {};
+            var subMockObj = {};
+            log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^');
+            for (var iq = 0; iq < fcount; iq++) {
+                var data = dataTemplate.Fields[iq].GenerateData();
+                log.logger(data);
+                mockObj[dataTemplate.Fields[iq].Name] = data;
+            }
 
-            dataTemplate.MockObj[dataTemplate.SubMocks[i].ObjectName] = dataTemplate.SubMocks[i].Mock.MockObj;
+            for (var iz = 0; iz < scount; iz++) {
+                dataTemplate.SubMocks[iz].Mock.MakeObj();
+                var obj = dataTemplate.SubMocks[iz].Mock;
+                mockObj[dataTemplate.SubMocks[iz].ObjectName] = dataTemplate.SubMocks[iz].Mock.MockObj;
+            }
+
+            if (dataTemplate.IsMain === true) {
+                objJSON.push(mockObj)
+            } else {
+
+                if (dataTemplate.SingleObject === true) {
+                    dataTemplate.MockObj = mockObj;
+                } else {
+                    dataTemplate.MockObj.push(mockObj);
+                }
+
+                log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^');
+            }
         }
-        log.logger('############################');
+
         if (callback) { //the end = make response
             callback();
         }
@@ -152,7 +178,6 @@ var Mock = (function() {
             values = [this.Id];
             sql = 'Select * from Service_DataTemplates where id=?';
         } else {
-
             usingId = dataTemplate.IdCode;
             log.logger(dataTemplate);
             log.logger('load mock with idCode:' + dataTemplate.IdCode);
@@ -175,7 +200,13 @@ var Mock = (function() {
                 dataTemplate.Max = templateresults[0].max;
                 dataTemplate.Id = templateresults[0].id;
                 dataTemplate.IdCode = templateresults[0].idCode;
-                dataTemplate.RowCount = randomData.getRandomRange(dataTemplate.Min,dataTemplate.Max);
+
+                if (dataTemplate.Max == dataTemplate.Min) {
+                    dataTemplate.RowCount = dataTemplate.Min;
+                } else {
+                    dataTemplate.RowCount = randomData.getRandomRange(dataTemplate.Min, dataTemplate.Max);
+                }
+
                 log.logger('row count:' + dataTemplate.RowCount);
                 values = [dataTemplate.Id];
                 //add the realid to the list.
