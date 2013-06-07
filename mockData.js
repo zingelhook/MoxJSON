@@ -4,7 +4,7 @@ var log = require('./logger.js');
 var mockField = require('./mockField.js');
 var SVCresponse;
 var mainMock;
-
+//contains list of all mocks that must be loaded before we can generate JSON
 var MockList = (function() {
     function MockList() {
         this.List = [];
@@ -55,6 +55,8 @@ var MockList = (function() {
                 log.logger('List is at:' + this.List.length);
                 if (this.List.length === 0) {
                     this._done();
+                }else{
+                    log.logger(this.List);
                 }
             }
 
@@ -80,17 +82,15 @@ Array.prototype.indexOf = function(obj, fromIndex) {
     return -1;
 };
 
-exports.getData = function(id, response, userrequest, outputType) {
+exports.getData = function(idCode, response, userrequest, outputType) {
     log.logger('start');
-
     output = outputType;
     request = userrequest;
     SVCresponse = response;
     //the callback when the database client is ready.
     var callback = function() {
         log.logger('Msql Connection Callback');
-        mocklist.Add(id);
-        mainMock = new Mock(id);
+        mainMock = new Mock(null, idCode, true);
         mainMock.Load();
     }
 
@@ -100,42 +100,68 @@ exports.getData = function(id, response, userrequest, outputType) {
 
 
 var Mock = (function() {
-    function Mock(id) {
+    function Mock(id, idCode, isMain) {
+        var dataTemplate = this;
+        this.IdCode = idCode;
+        this.IsMain = isMain;
         this.Id = id;
         log.logger('----------------------------');
-        log.logger('init mock with id:' + id);
+        if (dataTemplate.Id != null) {
+            log.logger('init mock with id:' + dataTemplate.Id);
+        } else {
+            if (!dataTemplate.IdCode) {
+                log.logger(dataTemplate);
+
+            } else {
+                log.logger('init mock with idCode:' + dataTemplate.IdCode);
+            }
+
+        }
+
     }
     Mock.prototype.MakeObj = function(callback) {
         var dataTemplate = this;
         dataTemplate.MockObj = {};
-        log.logger('call GenerateJSONStubObject for:' + this.Id);
+        log.logger('############################');
+        log.logger('call MakeObj for:' + dataTemplate.Id);
 
         var count = dataTemplate.Fields.length;
         for (var i = 0; i < count; i++) {
+            //log.logger(dataTemplate.Fields[i].Name);
             this.MockObj[dataTemplate.Fields[i].Name] = dataTemplate.Fields[i].Value;
         }
 
         count = dataTemplate.SubMocks.length;
         for (var i = 0; i < count; i++) {
-            log.logger(dataTemplate.SubMocks[i].Mock);
+            //log.logger(dataTemplate.SubMocks[i].Mock);
             dataTemplate.SubMocks[i].Mock.MakeObj();
             var obj = dataTemplate.SubMocks[i].Mock;
             //console.log(obj);
             dataTemplate.MockObj[dataTemplate.SubMocks[i].ObjectName] = dataTemplate.SubMocks[i].Mock.MockObj;
         }
-         
+        log.logger('############################');
         if (callback) { //the end = make response
             callback();
         }
     };
     Mock.prototype.Load = function() {
-
         var dataTemplate = this;
-        log.logger('load mock with id:' + this.Id);
+        var values, sql, usingId;
+        if (dataTemplate.Id != null) {
+            usingId = dataTemplate.Id;
+            log.logger('load mock with id:' + dataTemplate.Id);
+            values = [this.Id];
+            sql = 'Select * from Service_DataTemplates where id=?'
+        } else {
 
-        //Loading mock meta
-        var values = [this.Id];
-        mysql.client.query('Select * from Service_DataTemplates where idCode=?', values, function(error, templateresults) {
+            usingId = dataTemplate.IdCode;
+            log.logger(dataTemplate);
+            log.logger('load mock with idCode:' + dataTemplate.IdCode);
+            values = [this.IdCode];
+            sql = 'Select * from Service_DataTemplates where idCode=?';
+        }
+
+        mysql.client.query(sql, values, function(error, templateresults) {
             if (error) {
                 log.logger("ClientReady Error: " + error.message);
                 client.end();
@@ -143,11 +169,19 @@ var Mock = (function() {
             }
 
             if (templateresults.length > 0) {
-                log.logger('Loading template from db:' + dataTemplate.Id);
+                log.logger('Loading template from db:' + usingId);
                 dataTemplate.Name = templateresults[0].name;
                 dataTemplate.LanguageVar = templateresults[0].langVar;
                 dataTemplate.Min = templateresults[0].min;
                 dataTemplate.Max = templateresults[0].max;
+                dataTemplate.Id = templateresults[0].id;
+                dataTemplate.IdCode = templateresults[0].idCode;
+                values = [dataTemplate.Id];
+                //add the realid to the list.
+                if (dataTemplate.IsMain === true) {
+                    log.logger('yoyoma');
+                    mocklist.Add(dataTemplate.Id);
+                }
 
                 //now load the fields
                 log.logger('call LoadFields');
@@ -178,6 +212,7 @@ var Mock = (function() {
 
                     // now load submocks
                     log.logger('call LoadSubMocks for:' + dataTemplate.Id);
+                    values = [dataTemplate.Id];
                     mysql.client.query('Select id,dataTemplateId ,childTemplateId,objectName from Service_DataTemplates_SubTemplates where dataTemplateId=?', values,
 
                     function(error, results) {
@@ -197,7 +232,7 @@ var Mock = (function() {
                                 mocklist.Add(results[i].childTemplateId);
                                 var sm = new SubMock(results[i].id, results[i].dataTemplateId, results[i].childTemplateId, results[i].objectName);
                                 dataTemplate.SubMocks.push(sm);
-                                // sm.LoadMock(results[i].childTemplateId);
+
                                 mockObj[results[i].objectName] = sm.Mock.MockObj;
                             }
                             mocklist.Remove(dataTemplate.Id);
@@ -222,11 +257,10 @@ var SubMock = (function() {
     }
     SubMock.prototype.LoadMock = function(id) {
         log.logger('submock loading for:' + id);
-        var dt = new Mock(id);
-        dt.Load();
+        var dt = new Mock(id, null, false);
+        dt.Load('byId');
         this.Mock = dt;
     }
 
     return SubMock;
 })();
-
