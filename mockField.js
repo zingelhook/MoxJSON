@@ -1,52 +1,19 @@
+
+
 var randomData = require('./RandomData.js');
-
-
-
-exports.ObjectGenerator = (function() {
-    var that = this;
-
-    function ObjectGenerator(mock) {
-        this.Mock = mock;
+exports.MockField = (function() {
+    function MockField(name, typeName, predifinedData, options, sampleData) {
+        this.Name = name;
+        this.TypeName = typeName;
+        this.PredifinedData = predifinedData;
+        this.Options = options;
+        this.SampleData = sampleData;
+        this._generateData();
     }
-    ObjectGenerator.prototype.GenerateMock = function() {
-        var that = this;
-        var numberOfFields = this.Mock.Fields.length;
-        var obj = new Object();
-        for (var i = 0; i < numberOfFields; i++) {
-
-            var id = i;
-            if (this.Mock.Fields[i].Name == 'id') {
-                data = id;
-                obj[this.Mock.Fields[i].Name] = data;
-            } else {
-                var data = that.GenerateSingleData(this.Mock.Fields[i].PredifinedData, this.Mock.Fields[i]);
-                obj[this.Mock.Fields[i].Name] = data;
-            }
-        }
-      
-        return obj;
-
-    }
-    ObjectGenerator.prototype.GenerateSingleData = function(predefinedSampleData, field) {
+    MockField.prototype._generateData = function() {
+        var field = this;
+        var name = field.PredifinedData;
         var data = '';
-        var that=this;
-        //console.log(predefinedSampleData);
-        if (predefinedSampleData) {
-            data = that.GetPredefinedSampleData(predefinedSampleData, field);
-            if (!data && data !== 0) {
-                //must be custom
-                data = '';
-            }
-
-        } else {
-            //custom
-            data = '';
-        }
-        return data;
-    }
-    ObjectGenerator.prototype.GetPredefinedSampleData = function(name, field) {
-        var data = '';
-        var that = this;
         if (name) {
             switch (name) {
                 case 'Date':
@@ -91,7 +58,7 @@ exports.ObjectGenerator = (function() {
                             num = parseInt(opt.length, 10);
                         }
                     }
-                    data = that.GetRandonNumber(num);
+                    data = randomData.getRandonNumber(num);
 
                     break;
                 case 'UserName':
@@ -111,9 +78,7 @@ exports.ObjectGenerator = (function() {
                     break;
                 default:
                     return null;
-
             }
-
         }
         if (field.Options) {
             var opt = JSON.parse(field.Options);
@@ -131,18 +96,7 @@ exports.ObjectGenerator = (function() {
             }
 
         }
-        return data;
+        this.Value = data;
     }
-
-    ObjectGenerator.prototype.GetRandonNumber = function(num) {
-        var num;
-        var str = '';
-        for (i = 0; i <= num; i++) {
-            num = Math.floor(Math.random() * 9);
-        }
-        return num;
-    }
-
-
-    return ObjectGenerator;
+    return MockField;
 })();
