@@ -19,6 +19,9 @@ var MockList = (function() {
     };
     MockList.prototype._done = function() {
         log.logger('total mocks loaded:' + this.MocksLoaded,2);
+
+        //make sure this list is empty
+        this.List=[];
         var callback = function() {
 
             SVCresponse.writeHead(200, {
