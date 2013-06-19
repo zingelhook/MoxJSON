@@ -108,8 +108,7 @@ exports.getRandonCountry = function() {
 }
 
 exports.getRandonNumber = function(num) {
-    var num,
-        str = '';
+    var num;
     for (i = 0; i <= num; i++) {
         num = Math.floor(Math.random() * 9);
     }

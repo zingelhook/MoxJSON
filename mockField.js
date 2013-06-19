@@ -55,10 +55,14 @@ exports.MockField = (function() {
                         var opt = JSON.parse(field.Options);
                         if (opt.length) {
                             num = parseInt(opt.length, 10);
+                            data = randomData.getRandonNumber(num);
+                        } else if (opt.range) {
+                            var min = opt.range[0];
+                            var max = opt.range[1];
+                            data = randomData.getRandomRange(min,max);
                         }
                     }
-                    data = randomData.getRandonNumber(num);
-
+                    //data = randomData.getRandonNumber(num);
                     break;
                 case 'UserName':
                     data = randomData.randomAlphabetLower() + randomData.getRandomLastName();
@@ -71,6 +75,7 @@ exports.MockField = (function() {
                         var mySplitResult = field.SampleData.split(",");
                         var index = Math.floor(Math.random() * mySplitResult.length);
                         data = mySplitResult[index];
+
                     } else {
                         data = 'No Sample Data';
                     }
@@ -95,8 +100,9 @@ exports.MockField = (function() {
             }
 
         }
-        //this.Value = data;
+
         return data;
+
     }
     return MockField;
 })();

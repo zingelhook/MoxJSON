@@ -146,7 +146,14 @@ var Mock = (function() {
             log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^',1);
             for (var iq = 0; iq < fcount; iq++) {
                 var data = dataTemplate.Fields[iq].GenerateData();
+                console.log(data);
                 log.logger(data,1);
+                if(data==='true'){
+                    data=true;
+                }
+                if(data==='false'){
+                    data=false;
+                }
                 mockObj[dataTemplate.Fields[iq].Name] = data;
             }
 
