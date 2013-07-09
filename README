@@ -1,0 +1,2 @@
+To output json: add to url-output=json
+To use jsonp: default
