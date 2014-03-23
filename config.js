@@ -12,7 +12,7 @@ exports.DebugLevel=2;
 exports.MYSQLusername='root';
 exports.MYSQLdbname='mockJSON';
 exports.MYSQLhost='';
-exports.MYSQLpassword='hellcat';
+exports.MYSQLpassword='prod_password';
 exports.MYSQLport='3306';
 */
 
