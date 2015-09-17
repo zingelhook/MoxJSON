@@ -146,7 +146,7 @@ var Mock = (function() {
             log.logger('^^^^^^^^^^^^^^^^^^^^^^^^^',1);
             for (var iq = 0; iq < fcount; iq++) {
                 var data = dataTemplate.Fields[iq].GenerateData();
-                console.log(data);
+              //  console.log(data);
                 log.logger(data,1);
                 if(data==='true'){
                     data=true;
@@ -221,6 +221,7 @@ var Mock = (function() {
 
                 log.logger('row count:' + dataTemplate.RowCount,1);
                 values = [dataTemplate.Id];
+               // console.log(values);
                 //add the realid to the list.
                 if (dataTemplate.IsMain === true) {
                     mocklist.Add(dataTemplate.Id);
@@ -229,7 +230,7 @@ var Mock = (function() {
                 //now load the fields
                 log.logger('call LoadFields',1);
 
-                mysql.client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id    join Service_FieldType ft on ft.id = sf.typeId  where dataTemplateId=?', values,
+                mysql.client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id join Service_FieldType ft on ft.id = sf.typeId where dataTemplateId=?', values,
 
                 function(error, results) {
 

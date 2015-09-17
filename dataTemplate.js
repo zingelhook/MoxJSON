@@ -4,7 +4,7 @@ var mockField = require('./mockField.js');
 var mysql = require('./msqlClient.js');
 
 function logger(msg) {
-    console.log(msg);
+  //  console.log(msg);
 }
 var client = new require("mysql").createClient({
     host: 'localhost',

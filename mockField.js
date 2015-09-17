@@ -12,8 +12,10 @@ exports.MockField = (function() {
     MockField.prototype.GenerateData = function() {
         var field = this;
         var name = field.PredifinedData;
+       // console.log(field);
         var data = '';
         if (name) {
+            console.log(name);
             switch (name) {
                 case 'Date':
                     data = randomData.getSampleDate(field.Options);
@@ -44,6 +46,8 @@ exports.MockField = (function() {
                     break;
                 case 'Letter':
                     var randomnumber = Math.floor(Math.random() * 26);
+                    var alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+                   
                     data = alphabet[randomnumber];
                     break;
                 case 'Lorum':
@@ -61,8 +65,9 @@ exports.MockField = (function() {
                             var max = opt.range[1];
                             data = randomData.getRandomRange(min,max);
                         }
+                    }else{
+                       data = randomData.getRandonNumber(num); 
                     }
-                    //data = randomData.getRandonNumber(num);
                     break;
                 case 'UserName':
                     data = randomData.randomAlphabetLower() + randomData.getRandomLastName();

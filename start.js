@@ -9,7 +9,7 @@ var server = http.createServer(function(request, response) {
 	var urlObj = url.parse(request.url, true);
 	var id = urlObj.query.id;
 	var output = urlObj.query.output;
-	//var user = 'kgaddy';
+
 	request.on('end',
 
 		function() {
