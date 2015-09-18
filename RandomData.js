@@ -1,18 +1,19 @@
 var moment = require('moment');
 
-exports.buildRandomZip = function() {
+exports.buildRandomZip = function () {
     return '12943';
 }
-function RandomBit(){
-    if(Math.floor(Math.random() * 100)>49){
+function RandomBit() {
+    if (Math.floor(Math.random() * 100) > 49) {
         return true;
     }
-    else{
+    else {
         return false;
     }
 }
+
 //return random first name.
-exports.getFirstName = function() {
+exports.getFirstName = function () {
     var fistRnd, firstName = '';
 
     if (RandomBit()) {
@@ -26,24 +27,22 @@ exports.getFirstName = function() {
     return firstName;
 }
 
-exports.getRandomLastName = function() {
+exports.getRandomLastName = function () {
     var lastRnd = Math.floor(Math.random() * LAST_NAME.length);
     return LAST_NAME[lastRnd];
 }
 
-exports.getRandomState = function() {
+exports.getRandomState = function () {
     var rndState = Math.floor(Math.random() * STATES.length);
     return STATES[rndState];
 }
 
-exports.getRandomCity = function() {
+exports.getRandomCity = function () {
     var rndCity = Math.floor(Math.random() * CITIES.length);
     return CITIES[rndCity];
 }
 
-
-
-exports.buildAddress = function() {
+exports.buildAddress = function () {
     var rndStyle = Math.floor(Math.random() * 2);
     var rndHouse = Math.floor(Math.random() * 2000);
     var rndstreet = Math.floor(Math.random() * STREET.length);
@@ -58,29 +57,40 @@ exports.buildAddress = function() {
         default:
             address = rndHouse + ' ' + STREET[rndstreet];
             break;
-
     }
     return address;
 }
 
-exports.getRandonLorum = function() {
+exports.getRandonLorum = function () {
     var words = 'lorem ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum'.split(' ');
     var index = Math.floor(Math.random() * words.length);
     return words[index];
-
 }
 
-
-exports.getSampleDate = function(options) {
+exports.getSampleDate = function (options) {
     randomNumber = Math.floor(Math.random() * 100);
     var date = new Date();
     date.setDate(date.getDate() - randomNumber)
-
+  
     var mDate = moment(date);
+    var opt;
     if (options) {
-        var opt = JSON.parse(options);
-        if (opt.format) {
-            return mDate.format(opt.format);
+        try {
+            opt = JSON.parse(options);
+        }
+        catch (exception) {
+            console.log(exception);
+        }
+        finally {
+
+        }
+
+        if (opt !== undefined) {
+            if (opt.format) {
+                return mDate.format(opt.format);
+            } else {
+                return mDate.format("m/dd/yy");
+            }
         } else {
             return mDate.format("m/dd/yy");
         }
@@ -90,24 +100,22 @@ exports.getSampleDate = function(options) {
 }
 
 //function to get random number upto m
-exports.randomXToY = function(minVal, maxVal, floatVal) {
+exports.randomXToY = function (minVal, maxVal, floatVal) {
     var randVal = minVal + (Math.random() * (maxVal - minVal));
     return typeof floatVal == 'undefined' ? Math.round(randVal) : randVal.toFixed(floatVal);
 }
 
-
-exports.randomAlphabetLower = function() {
+exports.randomAlphabetLower = function () {
     var randVal = Math.floor(Math.random() * ALPABET_LOWER.length);
     return ALPABET_LOWER[randVal];
 }
 
-exports.getRandonCountry = function() {
-
+exports.getRandonCountry = function () {
     var randVal = Math.floor(Math.random() * COUNTRIES.length);
     return COUNTRIES[randVal];
 }
 
-exports.getRandonNumber = function(num) {
+exports.getRandonNumber = function (num) {
     var num;
     for (i = 0; i <= num; i++) {
         num = Math.floor(Math.random() * 9);
@@ -115,11 +123,11 @@ exports.getRandonNumber = function(num) {
     return num;
 }
 
-exports.getRandomRange = function(min, max) {
+exports.getRandomRange = function (min, max) {
     return parseInt(Math.random() * (max - min) + min, 10);
 }
 
-exports.dealRandomCard = function() {
+exports.dealRandomCard = function () {
     var suit = new Array(4)
     suit[0] = 'spade';
     suit[1] = 'heart';
@@ -146,7 +154,6 @@ exports.dealRandomCard = function() {
 
     return suit[randomSuit] + '-' + deck[randomNumber];
 }
-
 
 var MALE_FIRST_NAME = [];
 MALE_FIRST_NAME.push('James');
@@ -178,8 +185,9 @@ MALE_FIRST_NAME.push('Bill');
 MALE_FIRST_NAME.push('Louis');
 MALE_FIRST_NAME.push('Agilbert');
 
-
 var FEMALE_FIRSTNAME = [];
+FEMALE_FIRSTNAME.push('Izzy');
+FEMALE_FIRSTNAME.push('Jubilee');
 FEMALE_FIRSTNAME.push('Andrea');
 FEMALE_FIRSTNAME.push('Miranda');
 FEMALE_FIRSTNAME.push('Kay');
@@ -202,8 +210,6 @@ FEMALE_FIRSTNAME.push('Antoinette');
 FEMALE_FIRSTNAME.push('Morwenna');
 FEMALE_FIRSTNAME.push('Jessabella');
 FEMALE_FIRSTNAME.push('Alessandra');
-
-
 
 var LAST_NAME = [];
 LAST_NAME.push('Smith');
@@ -238,6 +244,9 @@ LAST_NAME.push('Beckermann');
 LAST_NAME.push('Alexopoulos');
 LAST_NAME.push('Constantinides');
 LAST_NAME.push('Panagopoulos');
+LAST_NAME.push('KONIGSBERG');
+LAST_NAME.push('PECKENPAUGH');
+LAST_NAME.push('SWARTZBAUGH');
 
 var STREET = [];
 
@@ -250,7 +259,7 @@ STREET.push('Liverpool Road');
 STREET.push('Battersea Rise');
 STREET.push('Great Sutton Street');
 STREET.push('Park Ave');
-STREET.push('Beacon point Lane');
+STREET.push('Long point Lane');
 STREET.push('Langridge Drive');
 STREET.push('Woodbridge');
 STREET.push('Waterside');
@@ -263,7 +272,7 @@ STREET.push('14 Street');
 STREET.push('OakLeaf');
 
 var STATES = [
-        ' Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Guam', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska, Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Northern Marianas Islands', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Puerto Rico', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Virgin Islands', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+    ' Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Guam', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska, Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Northern Marianas Islands', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Puerto Rico', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Virgin Islands', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
 ];
 var CITIES = ['Wildwood', '', 'Charleston', 'Clayton', 'Pineville', 'Mayberry', 'Melburne', 'Oakville', 'Winterville', 'Shady Groove', 'Cloverfield', 'Lilly', 'Lake Big Bear', 'Whistling Pines'];
 var ALPABET_LOWER = ['a', 'b', 'c', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];

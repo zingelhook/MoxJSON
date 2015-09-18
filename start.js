@@ -5,14 +5,14 @@ var mockData = require('./mockData.js');
 var svcLog = require('./serviceLog.js');
 var errorHandler = require('./error.js');
 var log = require('./logger.js');
-var server = http.createServer(function(request, response) {
+var server = http.createServer(function (request, response) {
 	var urlObj = url.parse(request.url, true);
 	var id = urlObj.query.id;
 	var output = urlObj.query.output;
 
 	request.on('end',
 
-		function() {
+		function () {
 			var serviceid = id;
 			log.logger(id, 0);
 			mockData.getData(serviceid, response, request, output);

@@ -1,17 +1,13 @@
 
 var config = require('./config.js');
 
-var client = new require("mysql").createClient({host:'localhost',port:config.MYSQLport,user: config.MYSQLusername,password:config.MYSQLpassword,database: config.MYSQLdbname});
+var client = new require("mysql").createClient({ host: 'localhost', port: config.MYSQLport, user: config.MYSQLusername, password: config.MYSQLpassword, database: config.MYSQLdbname });
 
-
-
-
-
-exports.logError = function(request, loggederror, serviceCode) {
+exports.logError = function (request, loggederror, serviceCode) {
     //check the connection. If connected move on, else make the connection.nn
     if (client.connected === false) {
 
-        client.connect(function(error, results) {
+        client.connect(function (error, results) {
             if (error) {
                 console.log('Connection Error: ' + error.message);
                 return;
@@ -20,37 +16,29 @@ exports.logError = function(request, loggederror, serviceCode) {
 
         });
     }
-    else
-    {
+    else {
         ClientConnectionReady(client);
     }
 
-
-
-
-
-    function ClientConnectionReady(client)
-    {
+    function ClientConnectionReady(client) {
         client.query('USE mockJSON',
-        function(error, results) {
-            if (error) {
-                console.log('ClientConnectionReady Error: ' + error.message);
-                client.end();
-                return;
-            }
-            ClientReady(client);
-        });
+            function (error, results) {
+                if (error) {
+                    console.log('ClientConnectionReady Error: ' + error.message);
+                    client.end();
+                    return;
+                }
+                ClientReady(client);
+            });
     };
 
-    function ClientReady(client)
-    {
+    function ClientReady(client) {
 
 
         var userAgent = request.headers['user-agent'];
         var svcId;
 
-        if (serviceCode)
-        {
+        if (serviceCode) {
             svcId = serviceCode;
         }
         else {
@@ -59,16 +47,16 @@ exports.logError = function(request, loggederror, serviceCode) {
         var verboseError = 'user agent:' + userAgent + '\n' + 'Service Code:' + svcId + '\n' + 'msg:' + loggederror;
         var values = [verboseError];
         client.query('INSERT INTO Error_Log SET error = ?', values,
-        function(error, results) {
-            if (error) {
-                console.log("ClientReady Error: " + error.message);
-                client.end();
-                return;
+            function (error, results) {
+                if (error) {
+                    console.log("ClientReady Error: " + error.message);
+                    client.end();
+                    return;
+                }
+                console.log('Inserted: ' + results.affectedRows + ' row.');
+                console.log('Id inserted: ' + results.insertId);
             }
-            console.log('Inserted: ' + results.affectedRows + ' row.');
-            console.log('Id inserted: ' + results.insertId);
-        }
-        );
+            );
 
     }
 }

@@ -9,7 +9,7 @@ var client = new require("mysql").createClient({
 });
 
 
-exports.logService = function(request, userName, serviceid, numberOfRows) {
+exports.logService = function (request, userName, serviceid, numberOfRows) {
 
     //check the connection. If connected move on, else make the connection.
     if (client.connected === false) {
@@ -21,14 +21,14 @@ exports.logService = function(request, userName, serviceid, numberOfRows) {
     function ClientConnectionReady(client) {
         client.query('USE mockJSON',
 
-        function(error, results) {
-            if (error) {
-                console.log('ClientConnectionReady Error: ' + error.message);
-                client.end();
-                return;
-            }
-            ClientReady(client);
-        });
+            function (error, results) {
+                if (error) {
+                    console.log('ClientConnectionReady Error: ' + error.message);
+                    client.end();
+                    return;
+                }
+                ClientReady(client);
+            });
     };
 
     function ClientReady(client) {
@@ -43,13 +43,13 @@ exports.logService = function(request, userName, serviceid, numberOfRows) {
         var values = [userName, userAgent, svcId, numberOfRows];
         client.query('INSERT INTO Service_Log SET user = ? , userAgent = ? , serviceId =? , numberOfRows=?', values,
 
-        function(error, results) {
-            if (error) {
-                console.log("ClientReady Error: " + error.message);
-                client.end();
-                return;
-            }
+            function (error, results) {
+                if (error) {
+                    console.log("ClientReady Error: " + error.message);
+                    client.end();
+                    return;
+                }
 
-        });
+            });
     }
 }

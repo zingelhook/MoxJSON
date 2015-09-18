@@ -9,17 +9,17 @@ exports.client = new require("mysql").createClient({
 });
 
 
-exports.ClientConnectionReady = function(client, callback) {
+exports.ClientConnectionReady = function (client, callback) {
 	client.query('USE mockJSON',
 
-	function(error, results) {
-		if (error) {
-			log.logger('ClientConnectionReady Error: ' + error.message);
-			client.end();
-			return;
-		}
-		callback();
-	});
+		function (error, results) {
+			if (error) {
+				log.logger('ClientConnectionReady Error: ' + error.message);
+				client.end();
+				return;
+			}
+			callback();
+		});
 
 	log.logger('MSQL connection made');
 };

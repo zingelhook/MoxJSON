@@ -4,7 +4,7 @@ var mockField = require('./mockField.js');
 var mysql = require('./msqlClient.js');
 
 function logger(msg) {
-  //  console.log(msg);
+    //  console.log(msg);
 }
 var client = new require("mysql").createClient({
     host: 'localhost',
@@ -15,17 +15,17 @@ var client = new require("mysql").createClient({
 });
 
 
-var SubMock = exports.(function() {
+var SubMock = exports.(function () {
     function SubMock(id, dataTemplateId, childTemplateId, objectName) {
         //logger('init submock:' + id);
         this.Id = id;
         this.DataTemplateId = dataTemplateId;
         this.ChildTemplateId = childTemplateId;
         this.ObjectName = objectName;
-        this.LoadMock(childTemplateId.DataTemplateId,null);
+        this.LoadMock(childTemplateId.DataTemplateId, null);
     }
-    SubMock.prototype.LoadMock = function(id) {
-      //  logger('submock loading..');
+    SubMock.prototype.LoadMock = function (id) {
+        //  logger('submock loading..');
         var dt = new DataTemplate(id);
         dt.Load();
         this.DT = dt;
@@ -36,7 +36,7 @@ var SubMock = exports.(function() {
 
 
 
-exports.DataTemplate = (function() {
+exports.DataTemplate = (function () {
     function DataTemplate(id, parentId, callback) {
         this.LoadedChildren = [];
         this.ParentId = parentId;
@@ -45,11 +45,11 @@ exports.DataTemplate = (function() {
         this._currentOperations = 0;
         logger('Init DataTemplate:' + id);
     }
-    DataTemplate.prototype.LogChildLoaded = function(submockId) {
+    DataTemplate.prototype.LogChildLoaded = function (submockId) {
         this.LoadedChildren.push[submockId];
     }
 
-    DataTemplate.prototype.GenerateJSONStubObject = function() {
+    DataTemplate.prototype.GenerateJSONStubObject = function () {
         logger('call GenerateJSONStubObject for:' + this.Id);
         var dataTemplate = this;
         this.MockObj = {};
@@ -75,14 +75,14 @@ exports.DataTemplate = (function() {
 
     },
 
-    DataTemplate.prototype.Load = function() {
+    DataTemplate.prototype.Load = function () {
         var dataTemplate = this;
         var id = dataTemplate.Id;
         logger('call Load:' + id);
 
 
         var values = [id];
-        mysql.client.query('Select * from Service_DataTemplates where idCode=?', values, function(error, templateresults) {
+        mysql.client.query('Select * from Service_DataTemplates where idCode=?', values, function (error, templateresults) {
             if (error) {
                 logger("ClientReady Error: " + error.message);
                 client.end();
@@ -100,7 +100,7 @@ exports.DataTemplate = (function() {
             }
         });
     };
-    DataTemplate.prototype.LoadFields = function(id) {
+    DataTemplate.prototype.LoadFields = function (id) {
         var dataTemplate = this;
         logger('call LoadFields');
 
@@ -108,28 +108,28 @@ exports.DataTemplate = (function() {
         var values = [id];
         mysql.client.query('Select sf.id, sf.name, ft.name as typeName,sf.typeId as typeId, sf.options, pd.name as predifinedData, sf.sampleData as sampleData from Service_DataTemplate_Fields rf join Service_Fields sf on rf.fieldId = sf.id join  Service_PredefinedSampleData pd on sf.predefinedSampleDataId = pd.id    join Service_FieldType ft on ft.id = sf.typeId  where dataTemplateId=?', values,
 
-        function(error, results) {
+            function (error, results) {
 
-            if (error) {
-                logger("ClientReady Error: " + error.message);
-                client.end();
-                return;
-            }
-            dataTemplate.Fields = [];
-            var numberOfFields = results.length;
+                if (error) {
+                    logger("ClientReady Error: " + error.message);
+                    client.end();
+                    return;
+                }
+                dataTemplate.Fields = [];
+                var numberOfFields = results.length;
 
-            //get the fields.
-            for (var i = 0; i < numberOfFields; i++) {
-                var field = new mockField.MockField(results[i].name, results[i].typeName, results[i].predifinedData, results[i].options, results[i].sampleData);
-                dataTemplate.Fields.push(field);
-            }
+                //get the fields.
+                for (var i = 0; i < numberOfFields; i++) {
+                    var field = new mockField.MockField(results[i].name, results[i].typeName, results[i].predifinedData, results[i].options, results[i].sampleData);
+                    dataTemplate.Fields.push(field);
+                }
 
-            logger('found ' + numberOfFields + ' fields for ' + id)
-            dataTemplate.LoadSubMocks(id);
-        });
+                logger('found ' + numberOfFields + ' fields for ' + id)
+                dataTemplate.LoadSubMocks(id);
+            });
 
     };
-    DataTemplate.prototype.LoadSubMocks = function(id) {
+    DataTemplate.prototype.LoadSubMocks = function (id) {
         var dataTemplate = this;
         // console.log(dataTemplate);
         logger('call LoadSubMocks for:' + id);
@@ -138,44 +138,44 @@ exports.DataTemplate = (function() {
         mysql.client.query('Select id,dataTemplateId ,childTemplateId,objectName from Service_DataTemplates_SubTemplates where dataTemplateId=?', values,
 
 
-        function(error, results) {
-            if (error) {
-                logger("ClientReady Error: " + error.message);
-                client.end();
-                return;
-            }
-            dataTemplate.SubMocks = [];
+            function (error, results) {
+                if (error) {
+                    logger("ClientReady Error: " + error.message);
+                    client.end();
+                    return;
+                }
+                dataTemplate.SubMocks = [];
 
-            var count = results.length;
-            if (count === 0) { //if no more mock - return the response
+                var count = results.length;
+                if (count === 0) { //if no more mock - return the response
 
-            } else { //keep loading mocks
-                for (var i = 0; i < count; i++) {
-                    var sm = new SubMock(results[i].id, results[i].dataTemplateId, results[i].childTemplateId, results[i].objectName);
-                    dataTemplate.SubMocks.push(sm);
+                } else { //keep loading mocks
+                    for (var i = 0; i < count; i++) {
+                        var sm = new SubMock(results[i].id, results[i].dataTemplateId, results[i].childTemplateId, results[i].objectName);
+                        dataTemplate.SubMocks.push(sm);
+                    }
+
                 }
 
-            }
 
+                //log the fact that this mock is loaded to its parent.
+                var parent = loadedMocks.find(dataTemplateId.ParentId);
+                if (parent) {
+                    parent.push(dataTemplate.Id);
 
-            //log the fact that this mock is loaded to its parent.
-            var parent = loadedMocks.find(dataTemplateId.ParentId);
-            if (parent) {
-                parent.push(dataTemplate.Id);
+                } else {
+                    var p = {};
+                    p.id = dataTemplate.ParentId;
+                    p.children = [];
+                    p.children.push(id);
+                    //var pp = [this.ParentId][id];
 
-            } else {
-                var p = {};
-                p.id = dataTemplate.ParentId;
-                p.children = [];
-                p.children.push(id);
-                //var pp = [this.ParentId][id];
+                    loadedMocks.push(p);
+                }
 
-                loadedMocks.push(p);
-            }
+                logger(loadedMocks);
 
-            logger(loadedMocks);
-
-        });
+            });
     };
     return DataTemplate;
 })();

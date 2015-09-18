@@ -1,5 +1,5 @@
 var randomData = require('./RandomData.js');
-exports.MockField = (function() {
+exports.MockField = (function () {
     function MockField(name, typeName, predifinedData, options, sampleData) {
         this.Name = name;
         this.TypeName = typeName;
@@ -9,10 +9,9 @@ exports.MockField = (function() {
 
     }
 
-    MockField.prototype.GenerateData = function() {
+    MockField.prototype.GenerateData = function () {
         var field = this;
         var name = field.PredifinedData;
-       // console.log(field);
         var data = '';
         if (name) {
             switch (name) {
@@ -46,7 +45,7 @@ exports.MockField = (function() {
                 case 'Letter':
                     var randomnumber = Math.floor(Math.random() * 26);
                     var alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
-                   
+
                     data = alphabet[randomnumber];
                     break;
                 case 'Lorum':
@@ -62,10 +61,10 @@ exports.MockField = (function() {
                         } else if (opt.range) {
                             var min = opt.range[0];
                             var max = opt.range[1];
-                            data = randomData.getRandomRange(min,max);
+                            data = randomData.getRandomRange(min, max);
                         }
-                    }else{
-                       data = randomData.getRandonNumber(num); 
+                    } else {
+                        data = randomData.getRandonNumber(num);
                     }
                     break;
                 case 'UserName':
@@ -89,24 +88,33 @@ exports.MockField = (function() {
             }
         }
         if (field.Options) {
-            var opt = JSON.parse(field.Options);
-            if (opt.length) {
-                var len = parseInt(opt.length, 10);
-                if (data.length > len) {
-                    data = data.substring(0, len);
+            var opt;
+            try {
+                opt = JSON.parse(options);
+            }
+            catch (exception) {
+                console.log(exception);
+            }
+            finally {
+
+            }
+            if (opt !== undefined) {
+                if (opt.length) {
+                    var len = parseInt(opt.length, 10);
+                    if (data.length > len) {
+                        data = data.substring(0, len);
+                    }
+                }
+                if (opt.prepend) {
+                    data = opt.prepend + data;
+                }
+                if (opt.append) {
+                    data = data + opt.append;
                 }
             }
-            if (opt.prepend) {
-                data = opt.prepend + data;
-            }
-            if (opt.append) {
-                data = data + opt.append;
-            }
-
         }
 
         return data;
-
     }
     return MockField;
 })();
