@@ -147,7 +147,7 @@ exports.dealRandomCard = function() {
     return suit[randomSuit] + '-' + deck[randomNumber];
 }
 
-var alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
 var MALE_FIRST_NAME = [];
 MALE_FIRST_NAME.push('James');
 MALE_FIRST_NAME.push('Kevin');

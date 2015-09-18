@@ -15,7 +15,6 @@ exports.MockField = (function() {
        // console.log(field);
         var data = '';
         if (name) {
-            console.log(name);
             switch (name) {
                 case 'Date':
                     data = randomData.getSampleDate(field.Options);
