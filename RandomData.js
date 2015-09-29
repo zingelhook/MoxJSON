@@ -71,8 +71,9 @@ exports.getSampleDate = function (options) {
     randomNumber = Math.floor(Math.random() * 100);
     var date = new Date();
     date.setDate(date.getDate() - randomNumber)
-  
+
     var mDate = moment(date);
+    console.log(mDate.format("MM/DD/YY"));
     var opt;
     if (options) {
         try {
@@ -89,13 +90,13 @@ exports.getSampleDate = function (options) {
             if (opt.format) {
                 return mDate.format(opt.format);
             } else {
-                return mDate.format("m/dd/yy");
+                return mDate.format(MM/DD/YY);
             }
         } else {
-            return mDate.format("m/dd/yy");
+            return mDate.format("MM/DD/YY");
         }
     } else {
-        return mDate.format("m/dd/yy");
+        return mDate.format("MM/DD/YY");
     }
 }
 
