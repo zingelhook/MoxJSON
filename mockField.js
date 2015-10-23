@@ -15,6 +15,9 @@ exports.MockField = (function () {
         var data = '';
         if (name) {
             switch (name) {
+                case 'guid':
+                    data = randomData.getGuid();
+                    break;
                 case 'Date':
                     data = randomData.getSampleDate(field.Options);
                     break;

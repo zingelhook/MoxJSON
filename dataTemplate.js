@@ -6,6 +6,7 @@ var mysql = require('./msqlClient.js');
 function logger(msg) {
     //  console.log(msg);
 }
+
 var client = new require("mysql").createClient({
     host: 'localhost',
     port: config.MYSQLport,
@@ -13,7 +14,6 @@ var client = new require("mysql").createClient({
     password: config.MYSQLpassword,
     database: config.MYSQLdbname
 });
-
 
 var SubMock = exports.(function () {
     function SubMock(id, dataTemplateId, childTemplateId, objectName) {
@@ -33,8 +33,6 @@ var SubMock = exports.(function () {
 
     return SubMock;
 })();
-
-
 
 exports.DataTemplate = (function () {
     function DataTemplate(id, parentId, callback) {
@@ -71,15 +69,12 @@ exports.DataTemplate = (function () {
         }
         this._change();
         //console.log(this.Id);
-
-
     },
 
     DataTemplate.prototype.Load = function () {
         var dataTemplate = this;
         var id = dataTemplate.Id;
         logger('call Load:' + id);
-
 
         var values = [id];
         mysql.client.query('Select * from Service_DataTemplates where idCode=?', values, function (error, templateresults) {
@@ -115,6 +110,7 @@ exports.DataTemplate = (function () {
                     client.end();
                     return;
                 }
+                
                 dataTemplate.Fields = [];
                 var numberOfFields = results.length;
 
@@ -131,12 +127,11 @@ exports.DataTemplate = (function () {
     };
     DataTemplate.prototype.LoadSubMocks = function (id) {
         var dataTemplate = this;
-        // console.log(dataTemplate);
+
         logger('call LoadSubMocks for:' + id);
         var values = [id];
         var dataTemplate = this;
         mysql.client.query('Select id,dataTemplateId ,childTemplateId,objectName from Service_DataTemplates_SubTemplates where dataTemplateId=?', values,
-
 
             function (error, results) {
                 if (error) {
@@ -154,10 +149,8 @@ exports.DataTemplate = (function () {
                         var sm = new SubMock(results[i].id, results[i].dataTemplateId, results[i].childTemplateId, results[i].objectName);
                         dataTemplate.SubMocks.push(sm);
                     }
-
                 }
-
-
+                
                 //log the fact that this mock is loaded to its parent.
                 var parent = loadedMocks.find(dataTemplateId.ParentId);
                 if (parent) {
@@ -168,13 +161,9 @@ exports.DataTemplate = (function () {
                     p.id = dataTemplate.ParentId;
                     p.children = [];
                     p.children.push(id);
-                    //var pp = [this.ParentId][id];
-
                     loadedMocks.push(p);
                 }
-
                 logger(loadedMocks);
-
             });
     };
     return DataTemplate;

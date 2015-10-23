@@ -27,6 +27,16 @@ exports.getFirstName = function () {
     return firstName;
 }
 
+exports.getGuid = function () {
+				function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+				}
+				return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
+
 exports.getRandomLastName = function () {
     var lastRnd = Math.floor(Math.random() * LAST_NAME.length);
     return LAST_NAME[lastRnd];
@@ -90,7 +100,7 @@ exports.getSampleDate = function (options) {
             if (opt.format) {
                 return mDate.format(opt.format);
             } else {
-                return mDate.format(MM/DD/YY);
+                return mDate.format(MM / DD / YY);
             }
         } else {
             return mDate.format("MM/DD/YY");

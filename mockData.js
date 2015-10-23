@@ -6,6 +6,7 @@ var randomData = require('./RandomData.js');
 var SVCresponse;
 var mainMock;
 var objJSON = [];
+
 //contains list of all mocks that must be loaded before we can generate JSON
 var MockList = (function () {
     function MockList() {
@@ -106,7 +107,6 @@ exports.getData = function (idCode, response, userrequest, outputType) {
     mysql.ClientConnectionReady(mysql.client, callback);
 };
 
-
 var Mock = (function () {
     function Mock(id, idCode, isMain) {
         var dataTemplate = this;
@@ -125,6 +125,7 @@ var Mock = (function () {
             }
         }
     }
+
     Mock.prototype.MakeObj = function (callback) {
         var dataTemplate = this;
         dataTemplate.SingleObject = false;
@@ -181,6 +182,7 @@ var Mock = (function () {
             callback();
         }
     };
+    
     Mock.prototype.Load = function () {
         var dataTemplate = this;
         var values, sql, usingId;
@@ -286,8 +288,8 @@ var Mock = (function () {
             }
         });
     };
+    
     return Mock;
-
 })();
 
 var SubMock = (function () {
