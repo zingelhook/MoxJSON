@@ -5,6 +5,11 @@ var mockData = require('./mockData.js');
 var svcLog = require('./serviceLog.js');
 var errorHandler = require('./error.js');
 var log = require('./logger.js');
+var fs = require("fs");
+var dbSetUp = require('./databaseSetUp.js'); 
+
+dbSetUp.GenerateTables();
+
 var server = http.createServer(function (request, response) {
 	var urlObj = url.parse(request.url, true);
 	var id = urlObj.query.id;
